@@ -2,25 +2,34 @@ module Main exposing (..)
 
 import Html exposing (Html, text, div, h1, img)
 import Html.Attributes exposing (src)
-
+import Foods exposing (..)
+import Json.Decode exposing (Value)
+import List exposing(..)
 
 ---- MODEL ----
 
 
 type alias Model =
-    { food : String }
+    { foods : List Food }
 
 initModel : Model
 initModel =
-  { food = "banan" }
+  { foods = [] }
 
 type alias Flags =
-    { food : String }
+    { foods : Json.Decode.Value }
 
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    ( { initModel | food = flags.food }, Cmd.none )
+    case Json.Decode.decodeValue Foods.decoder flags.foods of
+        Ok foods ->
+            { foods = foods } ! []
+
+        Err err ->
+            Debug.crash err
+--init flags =
+--    ( { initModel | foods = Json.Decode.decodeValue Foods.decoder flags.foods }, Cmd.none )
 
 
 
@@ -44,7 +53,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ img [ src "/logo.svg" ] []
-        , h1 [] [ text "Your Elm App is working!" ]
+        , h1 [] [ text (toString (List.length model.foods)) ]
         ]
 
 
@@ -54,7 +63,7 @@ view model =
 
 main : Program Flags Model Msg
 main =
-    Html.programWithFlags
+        Html.programWithFlags
         { view = view
         , init = init
         , update = update
