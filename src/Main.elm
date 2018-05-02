@@ -6,20 +6,20 @@ import Json.Decode exposing (Value)
 import UIComponents exposing(..)
 
 
-type Msg
-    = ChangeSearchQuery String | ClearSuggestions
-
 ---- MODEL ----
 
 
+type Msg
+    = ChangeSearchQuery String | ClearSuggestions | SelectFood Int | UnSelectFood Int
+
 type alias Model =
-    { foods : List Food, filteredFoods : List Food, searchQuery : String }
+    { foods : List Food, suggestedFoods : List Food, searchQuery : String, selectedFoods : List (Food, Int) }
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     case Json.Decode.decodeValue Foods.decoder flags.foods of
         Ok foods ->
-            { foods = foods, filteredFoods = [], searchQuery = "" } ! []
+            { foods = foods, suggestedFoods = [], searchQuery = "", selectedFoods = [] } ! []
 
         Err err ->
             Debug.crash err
@@ -34,11 +34,15 @@ update msg model =
     ChangeSearchQuery newSearchQuery ->
       ({
           model | searchQuery = newSearchQuery,
-          filteredFoods = List.filter (\{name} -> String.length newSearchQuery >= 2 && String.contains newSearchQuery name) model.foods
+         suggestedFoods = List.filter (\{name} -> String.length newSearchQuery >= 2 && String.contains newSearchQuery name) model.foods
         }, Cmd.none )
     ClearSuggestions ->
-        ({ model | filteredFoods = [] }, Cmd.none)
-
+        ({ model | suggestedFoods = [] }, Cmd.none)
+    SelectFood foodId ->
+        ({ model | suggestedFoods = [], selectedFoods = model.selectedFoods ++ List.map (\food -> (food, 0)) (List.filter (\food -> food.id == foodId) model.foods)}, Cmd.none)
+    UnSelectFood foodId->
+        ({ model | selectedFoods = List.filter (\(food, _) -> food.id /= foodId) model.selectedFoods}, Cmd.none)
+        
 
 ---- VIEW ----
 
@@ -46,9 +50,11 @@ update msg model =
 view : Model -> Html Msg
 view model =
     let
-        suggestions = List.map (\food -> (food.id, food.name)) model.filteredFoods
+        suggestions = List.map (\food -> (food.id, food.name)) model.suggestedFoods
     in
-        searchCard (\x -> ChangeSearchQuery x) ClearSuggestions suggestions
+        div [] 
+            ([searchCard (\x -> ChangeSearchQuery x) ClearSuggestions (\x -> SelectFood x) suggestions] ++
+        (List.map (\(food, amount) -> card [ clearButton (\x -> UnSelectFood x) food.id, text food.name ]) model.selectedFoods))
 
 
 ---- PROGRAM ----

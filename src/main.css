@@ -14,23 +14,35 @@ body {
 .card {
   box-shadow: 0 3px 6px rgba(0,0,0,0.16), 0 3px 6px rgba(0,0,0,0.23);
   background: white;
-}
-input {
-  font-size: 20pt;
-  border-width: 0px;
-}
-.icon {
-  width: 50px;
-  height: 50px;
-  font-size: 50px;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  font-size: 16pt;
 }
 .search {
   display: grid;
   grid-gap: 1rem;
-  grid-template-columns: 50px 1fr;
+  grid-template-columns: 2rem 1fr;
   grid-auto-flow: row dense;
-  font-size: 24pt;
-  padding: 1rem;
+  font-size: 18pt;
+  vertical-align: middle;
+}
+input {
+  border-width: 0px;
+  font-size: inherit;
+  width: 100%;
+}
+.icon {
+  width: 2rem;
+  height: 2rem;
+  font-size: 2rem;
+}
+.smallIcon {
+  width: 1rem;
+  height: 1rem;
+  font-size: 1rem;
+}
+.card .smallIcon {
+  float: right;
 }
 .search .icon {
   color: #606060;
@@ -44,14 +56,12 @@ hr {
 .list {
   display: grid;
   grid-gap: 1rem;
-  grid-template-columns: 50px 1fr;
+  grid-template-columns: 2rem 1fr;
   grid-auto-flow: row dense;
-  font-size: 20pt;
-  padding: 1rem;
+}
+.list > * {
+  align-self: center;
 }
 .list .icon {
   color: #e0e0e0;
-}
-span {
-  font-size: inherit;
 }
