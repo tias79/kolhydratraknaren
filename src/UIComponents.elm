@@ -1,8 +1,9 @@
-module UIComponents exposing (card, searchCard, clearButton)
+module UIComponents exposing (card, searchCard, clearButton, numberinput)
 
 import Html exposing (Html, text, div, h1, img, input, i, hr, ul, li, span, a)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import String exposing (toInt)
 
 search : (String -> msg) -> msg -> (Int -> msg) -> Bool -> Html msg
 search changeSearchQueryMsg clearSuggestionsMsg selectMsg enableBack =
@@ -57,3 +58,9 @@ list items selectMsg =
 
 empty : Html msg
 empty = text ""
+
+numberinput : (Int -> msg) -> Int -> Html msg
+numberinput msg nr = input [type_ "number", style [("width", "3rem")], onInput (\str ->
+    msg (case (toInt str) of
+        Err err -> 0
+        Ok val -> val)), value (toString nr)] []

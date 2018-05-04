@@ -26,10 +26,16 @@ body {
   font-size: 18pt;
   vertical-align: middle;
 }
-input {
-  border-width: 0px;
-  font-size: inherit;
+.search input {
   width: 100%;
+  border-width: 0px;
+}
+input {
+  font-size: inherit;
+  border-bottom: 1px solid black;
+  border-top: 0;
+  border-left: 0;
+  border-right: 0;
 }
 .icon {
   width: 2rem;
@@ -43,6 +49,7 @@ input {
 }
 .card .smallIcon {
   float: right;
+  color: #606060;
 }
 .search .icon {
   color: #606060;
