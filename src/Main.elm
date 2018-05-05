@@ -68,16 +68,18 @@ view model =
     let
         suggestions = List.map (\food -> (food.id, food.name)) model.suggestedFoods
     in
-        div [] 
-            ([searchCard (\x -> ChangeSearchQuery x) ClearSuggestions (\x -> SelectFood x) suggestions] ++
-        (List.map (
-            \(idx, food, amount) ->
-                let
-                    currentAmount = Maybe.withDefault food.gDefault amount                    
-                    currentAmountCH = round (toFloat currentAmount*food.gPercentage)
-                in
-                    card [ clearButton (\x -> UnSelectFood x) idx, numberinput (\x -> UpdateAmount idx (Just x)) currentAmount, text "g", br [] [], text food.name, br [] [], text (toString currentAmountCH ++ " g kh") ]) model.selectedFoods))
-
+        div [] [
+            toolbar [ text "Kolhydraträknaren"],
+            cardContainer 
+                ([searchCard (\x -> ChangeSearchQuery x) ClearSuggestions (\x -> SelectFood x) suggestions] ++
+            (List.map (
+                \(idx, food, amount) ->
+                    let
+                        currentAmount = Maybe.withDefault food.gDefault amount                    
+                        currentAmountCH = round (toFloat currentAmount*food.gPercentage)
+                    in
+                        card [ clearButton (\x -> UnSelectFood x) idx, numberinput (\x -> UpdateAmount idx (Just x)) currentAmount, text "g", br [] [], text food.name, br [] [], text (toString currentAmountCH ++ " g kh") ]) model.selectedFoods))
+        ]
 
 ---- PROGRAM ----
 

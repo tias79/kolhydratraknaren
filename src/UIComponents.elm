@@ -1,4 +1,4 @@
-module UIComponents exposing (card, searchCard, clearButton, numberinput)
+module UIComponents exposing (toolbar, card, cardContainer, searchCard, clearButton, numberinput)
 
 import Html exposing (Html, text, div, h1, img, input, i, hr, ul, li, span, a)
 import Html.Attributes exposing (..)
@@ -28,6 +28,13 @@ searchCard changeSearchQueryMsg clearSuggestionsMsg selectMsg suggestions =
             separatorComponent,
             listComponent
         ]
+
+toolbar  : List (Html msg) -> Html msg
+toolbar = div [ class "toolbar" ]
+
+cardContainer : List (Html msg) -> Html msg
+cardContainer =
+    div [ class "cardcontainer" ]
 
 card : List (Html msg) -> Html msg
 card =
