@@ -9,6 +9,7 @@ html {
 }
 body {
   background: #eeeeee;
+  font-size: 16pt;
 }
 .toolbar {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
@@ -29,15 +30,15 @@ body {
   background: white;
   margin-bottom: 0.5rem;
   padding: 1rem;
-  font-size: 16pt;
 }
 .search {
   display: grid;
   grid-gap: 1rem;
-  grid-template-columns: 2rem 1fr;
+  grid-template-columns: auto 1fr auto;
   grid-auto-flow: row dense;
-  font-size: 18pt;
-  vertical-align: middle;
+}
+.search > * {
+  align-self: center;
 }
 .search input {
   width: 100%;
@@ -49,11 +50,15 @@ input {
   border-top: 0;
   border-left: 0;
   border-right: 0;
+  -webkit-user-select: all;
+  -moz-user-select: all;
+  -ms-user-select: all;
+  user-select: all;
 }
 .icon {
-  width: 2rem;
-  height: 2rem;
-  font-size: 2rem;
+  width: 1.4rem;
+  height: 1.4rem;
+  font-size: 1.4rem;
 }
 .smallIcon {
   width: 1rem;
@@ -76,7 +81,7 @@ hr {
 .list {
   display: grid;
   grid-gap: 1rem;
-  grid-template-columns: 2rem 1fr;
+  grid-template-columns: 1.4rem 1fr;
   grid-auto-flow: row dense;
 }
 .list > * {

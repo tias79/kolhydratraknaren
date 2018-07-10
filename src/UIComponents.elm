@@ -5,26 +5,28 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import String exposing (toInt)
 
-search : (String -> msg) -> msg -> (Int -> msg) -> Bool -> Html msg
-search changeSearchQueryMsg clearSuggestionsMsg selectMsg enableBack =
+search : String -> (String -> msg) -> msg -> (Int -> msg) -> Bool -> Html msg
+search searchQuery changeSearchQueryMsg clearSuggestionsMsg selectMsg enableBack =
     let
-        icon = i [ class "icon material-icons", onClick clearSuggestionsMsg ] [ if enableBack then text "arrow_back" else text "search"]
+        leftIcon = i [ class "icon material-icons", onClick clearSuggestionsMsg ] [ if enableBack then text "arrow_back" else text "search"]
+        rightIcon = i [ class "icon material-icons", onClick clearSuggestionsMsg ] [ if enableBack then text "clear" else text ""]
     in
         div [ class "search" ]
             [
-            icon,
-            input [ type_ "text", placeholder "Sök livsmedel", onInput changeSearchQueryMsg ] []
+            leftIcon,
+            input [ id "searchInput", type_ "text", placeholder "Sök livsmedel", onInput changeSearchQueryMsg, value searchQuery ] [],
+            rightIcon
             ]
 
-searchCard : (String -> msg) -> msg -> (Int -> msg) -> List (Int, String) -> Html msg
-searchCard changeSearchQueryMsg clearSuggestionsMsg selectMsg suggestions =
+searchCard : String -> (String -> msg) -> msg -> (Int -> msg) -> List (Int, String) -> Html msg
+searchCard searchQuery changeSearchQueryMsg clearSuggestionsMsg selectMsg suggestions =
     let
         hasSuggestions = not (List.isEmpty suggestions)
         separatorComponent = if hasSuggestions then separator else empty
         listComponent = if hasSuggestions then list suggestions selectMsg else empty
     in
         card [
-            search changeSearchQueryMsg clearSuggestionsMsg selectMsg hasSuggestions,
+            search searchQuery changeSearchQueryMsg clearSuggestionsMsg selectMsg hasSuggestions,
             separatorComponent,
             listComponent
         ]

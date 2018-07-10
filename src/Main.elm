@@ -4,6 +4,8 @@ import Html exposing (Html, text, div, h1, img, input, br)
 import Foods exposing (..)
 import Json.Decode exposing (Value)
 import UIComponents exposing(..)
+import Dom exposing (focus) 
+import Task
 
 
 ---- MODEL ----
@@ -17,6 +19,7 @@ type Msg
     | SelectFood FoodId
     | UnSelectFood Index
     | UpdateAmount Index Amount
+    | FocusResult (Result Dom.Error ())
 
 type alias Model =
     {
@@ -31,7 +34,6 @@ init flags =
     case Json.Decode.decodeValue Foods.decoder flags.foods of
         Ok foods ->
             { foods = foods, suggestedFoods = [], searchQuery = "", selectedFoods = [] } ! []
-
         Err err ->
             Debug.crash err
 
@@ -48,7 +50,7 @@ update msg model =
          suggestedFoods = List.filter (\{name} -> String.length newSearchQuery >= 2 && String.contains newSearchQuery name) model.foods
         }, Cmd.none )
     ClearSuggestions ->
-        ({ model | suggestedFoods = [] }, Cmd.none)
+        { model | suggestedFoods = [], searchQuery = "" } ! [Task.attempt FocusResult (focus "searchInput")]
     SelectFood foodId ->
         ({ 
             model | suggestedFoods = [],
@@ -59,6 +61,13 @@ update msg model =
         ({ model | selectedFoods = List.filter (\(idx, _ ,_) -> idx /= foodIdx) model.selectedFoods}, Cmd.none)
     UpdateAmount foodIdx newAmount ->
         ({ model | selectedFoods = List.map (\(idx, food, amount) -> (idx, food, if foodIdx == idx then newAmount else amount)) model.selectedFoods}, Cmd.none)
+    FocusResult result ->
+        case result of
+            Err (Dom.NotFound id) ->
+                Debug.crash ("Can not find Dom element with id: " ++ id)
+            Ok () ->
+                model ! []
+
 
 ---- VIEW ----
 
@@ -71,7 +80,7 @@ view model =
         div [] [
             toolbar [ text "Kolhydraträknaren"],
             cardContainer 
-                ([searchCard (\x -> ChangeSearchQuery x) ClearSuggestions (\x -> SelectFood x) suggestions] ++
+                ([searchCard model.searchQuery (\x -> ChangeSearchQuery x) ClearSuggestions (\x -> SelectFood x) suggestions] ++
             (List.map (
                 \(idx, food, amount) ->
                     let
