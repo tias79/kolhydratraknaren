@@ -10,7 +10,8 @@ import Task
 
 ---- MODEL ----
 
-type alias Amount = Maybe Int
+type alias Amount = Int
+type alias CHAmount = Int
 type alias Index = Int
 
 type Msg
@@ -26,7 +27,7 @@ type alias Model =
         foods : List Food,
         suggestedFoods : List Food,
         searchQuery : String,
-        selectedFoods : List (Index, Food, Amount)
+        selectedFoods : List (Index, Food, Amount, CHAmount)
     }
 
 init : Flags -> ( Model, Cmd Msg )
@@ -55,12 +56,12 @@ update msg model =
         ({ 
             model | suggestedFoods = [],
             selectedFoods = model.selectedFoods ++ List.map (\food -> ((List.length model.selectedFoods),
-            food, Nothing)) (List.filter (\food -> food.id == foodId) model.foods)
+            food, food.gDefault, (calcCHAmount food.gDefault food))) (List.filter (\food -> food.id == foodId) model.foods)
         }, Cmd.none)
     UnSelectFood foodIdx ->
-        ({ model | selectedFoods = List.filter (\(idx, _ ,_) -> idx /= foodIdx) model.selectedFoods}, Cmd.none)
+        ({ model | selectedFoods = List.filter (\(idx, _ , _, _) -> idx /= foodIdx) model.selectedFoods}, Cmd.none)
     UpdateAmount foodIdx newAmount ->
-        ({ model | selectedFoods = List.map (\(idx, food, amount) -> (idx, food, if foodIdx == idx then newAmount else amount)) model.selectedFoods}, Cmd.none)
+        ({ model | selectedFoods = List.map (\(idx, food, amount, chAmount) -> (idx, food, if foodIdx == idx then newAmount else amount, if foodIdx == idx then (calcCHAmount newAmount food) else chAmount)) model.selectedFoods}, Cmd.none)
     FocusResult result ->
         case result of
             Err (Dom.NotFound id) ->
@@ -68,6 +69,8 @@ update msg model =
             Ok () ->
                 model ! []
 
+calcCHAmount : Amount -> Food -> CHAmount
+calcCHAmount amount food = round (toFloat amount*food.gPercentage)
 
 ---- VIEW ----
 
@@ -80,24 +83,25 @@ view model =
         div [] [
             toolbar [ 
                 text "Kolhydraträknaren",
-                searchCard model.searchQuery (\x -> ChangeSearchQuery x) ClearSuggestions (\x -> SelectFood x) suggestions],
+                searchCard model.searchQuery (\x -> ChangeSearchQuery x) ClearSuggestions (\x -> SelectFood x) suggestions
+            ],
             cardContainer
                 (List.map (
-                    \(idx, food, amount) ->
-                        let
-                            currentAmount = Maybe.withDefault food.gDefault amount                    
-                            currentAmountCH = round (toFloat currentAmount*food.gPercentage)
-                        in
-                            card [ clearButton (\x -> UnSelectFood x) idx, numberinput (\x -> UpdateAmount idx (Just x)) currentAmount, text "g", br [] [], text food.name, br [] [], text (toString currentAmountCH ++ " g kh") ]) model.selectedFoods),
+                    \(idx, food, amount, chAmount) ->
+                        card [
+                            clearButton (\x -> UnSelectFood x) idx,
+                            numberinput (\x -> UpdateAmount idx x) amount,
+                            text "g",
+                            br [] [],
+                            text food.name,
+                            br [] [],
+                            text ("= " ++ toString chAmount ++ " g kh")
+                        ]) model.selectedFoods),
             bottombar [
                 text ("Totalt " ++
-                (toString (List.sum (List.map (
-                    \(idx, food, amount) -> 
-                        let
-                            currentAmount = Maybe.withDefault food.gDefault amount
-                        in
-                            round (toFloat currentAmount*food.gPercentage)
-                    ) model.selectedFoods)))
+                    (List.map (\(_, _, _, chAmount) -> chAmount) model.selectedFoods
+                        |> List.sum
+                        |> toString)
                     ++ " g kh")
             ]
         ]
