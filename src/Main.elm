@@ -54,7 +54,7 @@ update msg model =
         { model | suggestedFoods = [], searchQuery = "" } ! [Task.attempt FocusResult (focus "searchInput")]
     SelectFood foodId ->
         ({ 
-            model | suggestedFoods = [],
+            model | suggestedFoods = [], searchQuery = "", 
             selectedFoods = model.selectedFoods ++ List.map (\food -> ((List.length model.selectedFoods),
             food, food.gDefault, (calcCHAmount food.gDefault food))) (List.filter (\food -> food.id == foodId) model.foods)
         }, Cmd.none)
