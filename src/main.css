@@ -15,21 +15,36 @@ body {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   background: royalblue;
   color: white;
-  padding: 1rem;
+  padding: 0.75rem;
   position: fixed;
   top: 0;
+  width: 100%;
+  height: 7rem;
+}
+.toolbar > * {
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+.toolbar-bottom {
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+  background: darkgray;
+  color: white;
+  padding: 0.75rem;
+  position: fixed;
+  bottom: 0;
   width: 100%;
   height: 3rem;
 }
 .cardcontainer {
-  padding: 8px;
-  margin-top: 3rem;
+  padding: 0.5rem;
+  margin-top: 7rem;
+  margin-bottom: 3rem;
 }
 .card {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   background: white;
   margin-bottom: 0.5rem;
-  padding: 1rem;
+  padding: 0.75rem;
 }
 .search {
   display: grid;

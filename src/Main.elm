@@ -78,16 +78,28 @@ view model =
         suggestions = List.map (\food -> (food.id, food.name)) model.suggestedFoods
     in
         div [] [
-            toolbar [ text "Kolhydraträknaren"],
-            cardContainer 
-                ([searchCard model.searchQuery (\x -> ChangeSearchQuery x) ClearSuggestions (\x -> SelectFood x) suggestions] ++
-            (List.map (
-                \(idx, food, amount) ->
-                    let
-                        currentAmount = Maybe.withDefault food.gDefault amount                    
-                        currentAmountCH = round (toFloat currentAmount*food.gPercentage)
-                    in
-                        card [ clearButton (\x -> UnSelectFood x) idx, numberinput (\x -> UpdateAmount idx (Just x)) currentAmount, text "g", br [] [], text food.name, br [] [], text (toString currentAmountCH ++ " g kh") ]) model.selectedFoods))
+            toolbar [ 
+                text "Kolhydraträknaren",
+                searchCard model.searchQuery (\x -> ChangeSearchQuery x) ClearSuggestions (\x -> SelectFood x) suggestions],
+            cardContainer
+                (List.map (
+                    \(idx, food, amount) ->
+                        let
+                            currentAmount = Maybe.withDefault food.gDefault amount                    
+                            currentAmountCH = round (toFloat currentAmount*food.gPercentage)
+                        in
+                            card [ clearButton (\x -> UnSelectFood x) idx, numberinput (\x -> UpdateAmount idx (Just x)) currentAmount, text "g", br [] [], text food.name, br [] [], text (toString currentAmountCH ++ " g kh") ]) model.selectedFoods),
+            bottombar [
+                text ("Totalt " ++
+                (toString (List.sum (List.map (
+                    \(idx, food, amount) -> 
+                        let
+                            currentAmount = Maybe.withDefault food.gDefault amount
+                        in
+                            round (toFloat currentAmount*food.gPercentage)
+                    ) model.selectedFoods)))
+                    ++ " g kh")
+            ]
         ]
 
 ---- PROGRAM ----
