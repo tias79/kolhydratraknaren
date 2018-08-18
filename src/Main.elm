@@ -48,7 +48,7 @@ update msg model =
     ChangeSearchQuery newSearchQuery ->
       ({
           model | searchQuery = newSearchQuery,
-         suggestedFoods = List.filter (\{name} -> String.length newSearchQuery >= 2 && String.contains newSearchQuery name) model.foods
+         suggestedFoods = filterAndSort newSearchQuery model.foods
         }, Cmd.none )
     ClearSuggestions ->
         { model | suggestedFoods = [], searchQuery = "" } ! [Task.attempt FocusResult (focus "searchInput")]
