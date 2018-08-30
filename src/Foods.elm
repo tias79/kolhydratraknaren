@@ -30,7 +30,7 @@ filterAndSort query inputFoods = filter query inputFoods
 filter : String -> List Food -> List Food
 filter query foods =
     let
-        subQueries = findSubQueries query        
+        subQueries = findSubQueries query
     in       
         List.filter
             (\{name} ->
@@ -44,7 +44,7 @@ findSubQueries : String -> List String
 findSubQueries query = (String.words query |> List.filter (\query -> String.length query >= 2))
 
 sort : String -> List Food -> List Food
-sort query foods = List.sortWith (\a b ->
+sort query  = List.sortWith (\a b ->
         let
             queryHitRatioA = queryHitRatio query a
             queryHitRatioB = queryHitRatio query b
@@ -60,7 +60,7 @@ sort query foods = List.sortWith (\a b ->
                     compare queryHitRankA queryHitRankB
             else
                 compare queryHitRatioA queryHitRatioB
-    ) foods
+    ) 
 
 queryHitRatio : String -> Food -> Float
 queryHitRatio query food =

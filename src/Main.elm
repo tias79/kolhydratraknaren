@@ -1,6 +1,6 @@
 module Main exposing (..)
 
-import Html exposing (Html, text, div, h1, img, input, br)
+import Html exposing (Html, text, div, h1, h2, img, input, br)
 import Foods exposing (..)
 import Json.Decode exposing (Value)
 import UIComponents exposing(..)
@@ -21,20 +21,22 @@ type Msg
     | UnSelectFood Index
     | UpdateAmount Index Amount
     | FocusResult (Result Dom.Error ())
+    | UpdateInfo Bool
 
 type alias Model =
     {
         foods : List Food,
         suggestedFoods : List Food,
         searchQuery : String,
-        selectedFoods : List (Index, Food, Amount, CHAmount)
+        selectedFoods : List (Index, Food, Amount, CHAmount),
+        infoShowing : Bool
     }
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
     case Json.Decode.decodeValue Foods.decoder flags.foods of
         Ok foods ->
-            { foods = foods, suggestedFoods = [], searchQuery = "", selectedFoods = [] } ! []
+            { foods = foods, suggestedFoods = [], searchQuery = "", selectedFoods = [], infoShowing = False } ! []
         Err err ->
             Debug.crash err
 
@@ -68,6 +70,9 @@ update msg model =
                 Debug.crash ("Can not find Dom element with id: " ++ id)
             Ok () ->
                 model ! []
+    UpdateInfo state ->
+         ({ model | infoShowing = state}, Cmd.none)
+        
 
 calcCHAmount : Amount -> Food -> CHAmount
 calcCHAmount amount food = round (toFloat amount*food.gPercentage)
@@ -80,29 +85,38 @@ view model =
     let
         suggestions = List.map (\food -> (food.id, food.name)) model.suggestedFoods
     in
-        div [] [
-            toolbar [ 
-                text "Kolhydraträknaren",
-                searchCard model.searchQuery (\x -> ChangeSearchQuery x) ClearSuggestions (\x -> SelectFood x) suggestions
-            ],
-            cardContainer
-                (List.map (
-                    \(idx, food, amount, chAmount) ->
-                        card [
-                            clearButton (\x -> UnSelectFood x) idx,
-                            numberinput (\x -> UpdateAmount idx x) amount,
-                            text "g",
-                            br [] [],
-                            text food.name,
-                            br [] [],
-                            text ("= " ++ toString chAmount ++ " g kh")
-                        ]) model.selectedFoods),
-            bottombar [
-                text ("Totalt " ++
-                    (List.map (\(_, _, _, chAmount) -> chAmount) model.selectedFoods
-                        |> List.sum
-                        |> toString)
-                    ++ " g kh")
+        container "framework" [
+            info model.infoShowing (UpdateInfo False)
+                [ 
+                    h1 [] [text "Kolhydraträknaren"],
+                    h2 [] [text "Version 1.0.0"],
+                    br [] [],
+                    (text "Alla data är hämtade från Livsmedelsverkets Livsmedelsdatabasen (2018-08-08).")
+                ],
+            container "main" [
+                toolbar [
+                    menu "Kolhydraträknaren" (UpdateInfo True),
+                    searchCard model.searchQuery (\x -> ChangeSearchQuery x) ClearSuggestions (\x -> SelectFood x) suggestions
+                ],
+                cardContainer
+                    (List.map (
+                        \(idx, food, amount, chAmount) ->
+                            card [
+                                clearButton (\x -> UnSelectFood x) idx,
+                                numberinput (\x -> UpdateAmount idx x) amount,
+                                text "g",
+                                br [] [],
+                                text food.name,
+                                br [] [],
+                                text ("= " ++ toString chAmount ++ " g kh")
+                            ]) model.selectedFoods),
+                bottombar [
+                    text ("Totalt " ++
+                        (List.map (\(_, _, _, chAmount) -> chAmount) model.selectedFoods
+                            |> List.sum
+                            |> toString)
+                        ++ " g kh")
+                ]
             ]
         ]
 

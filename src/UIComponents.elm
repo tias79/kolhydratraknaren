@@ -1,4 +1,4 @@
-module UIComponents exposing (toolbar, bottombar, card, cardContainer, searchCard, clearButton, numberinput)
+module UIComponents exposing (toolbar, bottombar, card, cardContainer, searchCard, clearButton, numberinput, icon, menu, container, info)
 
 import Html exposing (Html, text, div, h1, img, input, i, hr, ul, li, span, a)
 import Html.Attributes exposing (..)
@@ -8,8 +8,8 @@ import String exposing (toInt)
 search : String -> (String -> msg) -> msg -> (Int -> msg) -> Bool -> Html msg
 search searchQuery changeSearchQueryMsg clearSuggestionsMsg selectMsg enableBack =
     let
-        leftIcon = i [ class "icon material-icons", onClick clearSuggestionsMsg ] [ if enableBack then text "arrow_back" else text "search"]
-        rightIcon = i [ class "icon material-icons", onClick clearSuggestionsMsg ] [ if enableBack then text "clear" else text ""]
+        leftIcon = icon [ onClick clearSuggestionsMsg ] (if enableBack then "arrow_back" else "search")
+        rightIcon = icon [ onClick clearSuggestionsMsg ] (if enableBack then "clear" else "")
     in
         div [ class "search" ]
             [
@@ -48,7 +48,7 @@ card =
 clearButton : (Int -> msg) -> Int -> Html msg
 clearButton clearMsg id =
     div [] [
-        i [ class "smallIcon material-icons", onClick (clearMsg id)] [text "clear"]
+        smallIcon [ onClick (clearMsg id)] "clear"
     ]
 
 separator : Html msg
@@ -76,3 +76,22 @@ numberinput msg nr = input [type_ "number", style [("width", "3rem")], onInput (
     msg (case (toInt str) of
         Err err -> 0
         Ok val -> val)), value (toString nr)] []
+
+icon : List (Html.Attribute msg) -> String -> Html msg
+icon attrs name = i ([ class "icon material-icons"] ++ attrs) [ text name]
+
+smallIcon : List (Html.Attribute msg) -> String -> Html msg
+smallIcon attrs name = i ([ class "smallIcon material-icons"] ++ attrs) [ text name]
+
+menu : String -> msg -> Html msg
+menu title toggle = div [ class "menu" ] [
+        icon [ onClick toggle ] "info",
+        text title
+        ]
+
+container : String -> List (Html msg) -> Html msg
+container identity = div [ id identity ]
+
+info : Bool -> msg -> List (Html msg) -> Html msg
+info show doClose children = div [class "info", style [if show then ("display", "block") else ("display", "none") ], onClick doClose]
+                children
