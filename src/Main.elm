@@ -96,7 +96,7 @@ view model =
                         h2 [] [text "Version 1.0.0"]
                     ],
                     card [
-                        (text "Alla livsmedelsdata är hämtade från Livsmedelsverkets livsmedelsdatabas 2018-08-08. "),
+                        (text "Alla livsmedelsdata är hämtade från Livsmedelsverkets livsmedelsdatabas 2018-08-08. \"Livsmedelsdatabasen ska spegla det svenska livsmedelsutbudet.\""),
                         br [] [],
                         br [] [],
                         (text "Kolhydraträknaren är skapad av Mattias Eklöf. Om du uppskattar appen, vänligen överväg att donera en slant till Barndiabetesfonden.")
@@ -115,7 +115,7 @@ view model =
                                 numberinput (\x -> UpdateAmount idx x) amount,
                                 text "g",
                                 br [] [],
-                                text food.name,
+                                text (food.name ++ " (" ++ toString (food.gPercentage * 100) ++ "g/100g)"),
                                 br [] [],
                                 text ("= " ++ toString chAmount ++ " g kh")
                             ]) model.selectedFoods),
