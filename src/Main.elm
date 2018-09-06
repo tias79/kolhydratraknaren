@@ -88,10 +88,19 @@ view model =
         container "framework" [
             info model.infoShowing (UpdateInfo False)
                 [ 
-                    h1 [] [text "Kolhydraträknaren"],
-                    h2 [] [text "Version 1.0.0"],
-                    br [] [],
-                    (text "Alla data är hämtade från Livsmedelsverkets Livsmedelsdatabasen (2018-08-08).")
+                    card [
+                        logo
+                    ],
+                    card [
+                        h1 [] [text "Kolhydraträknaren"],
+                        h2 [] [text "Version 1.0.0"]
+                    ],
+                    card [
+                        (text "Alla livsmedelsdata är hämtade från Livsmedelsverkets livsmedelsdatabas 2018-08-08. "),
+                        br [] [],
+                        br [] [],
+                        (text "Kolhydraträknaren är skapad av Mattias Eklöf. Om du uppskattar appen, vänligen överväg att donera en slant till Barndiabetesfonden.")
+                    ]
                 ],
             container "main" [
                 toolbar [

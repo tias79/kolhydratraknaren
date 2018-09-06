@@ -1,4 +1,4 @@
-module UIComponents exposing (toolbar, bottombar, card, cardContainer, searchCard, clearButton, numberinput, icon, menu, container, info)
+module UIComponents exposing (toolbar, bottombar, card, cardContainer, searchCard, clearButton, numberinput, icon, menu, container, info, logo)
 
 import Html exposing (Html, text, div, h1, img, input, i, hr, ul, li, span, a)
 import Html.Attributes exposing (..)
@@ -23,11 +23,12 @@ searchCard searchQuery changeSearchQueryMsg clearSuggestionsMsg selectMsg sugges
     let
         hasSuggestions = not (List.isEmpty suggestions)
         separatorComponent = if hasSuggestions then separator else empty
-        listComponent = if hasSuggestions then list suggestions selectMsg else empty
+        listComponent = if hasSuggestions then card [ list suggestions selectMsg ] else empty
     in
-        card [
-            search searchQuery changeSearchQueryMsg clearSuggestionsMsg selectMsg hasSuggestions,
-            separatorComponent,
+        div [ class "searchCard" ] [
+            card [
+                search searchQuery changeSearchQueryMsg clearSuggestionsMsg selectMsg hasSuggestions
+            ],
             listComponent
         ]
 
@@ -58,9 +59,6 @@ list : List (Int, String) -> (Int -> msg) -> Html msg
 list items selectMsg =
     div [ class "list" ]
         (List.concatMap (\(id, name) -> [
---            i [ class "icon material-icons"] [
---              text "info"
---           ]
             div [][],
             div [onClick (selectMsg id)] [
                 text name
@@ -95,3 +93,6 @@ container identity = div [ id identity ]
 info : Bool -> msg -> List (Html msg) -> Html msg
 info show doClose children = div [class "info", style [if show then ("display", "block") else ("display", "none") ], onClick doClose]
                 children
+
+logo : Html msg
+logo = img ([class "logo", src "logo.svg"]) []
