@@ -1,0 +1,25 @@
+{
+    "name": "KolhydratraknarenCordova",
+    "displayName": "khCordova",
+    "version": "1.0.0",
+    "description": "Cordova project for Kolhydraträknaren.",
+    "main": "index.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "deploy": "cd .. && elm-app build && cd cordova && cordova run --device"
+    },
+    "author": "Mattias Eklöf",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "cordova-android": "7.0.0",
+        "cordova-plugin-whitelist": "^1.3.3"
+    },
+    "cordova": {
+        "plugins": {
+            "cordova-plugin-whitelist": {}
+        },
+        "platforms": [
+            "android"
+        ]
+    }
+}
