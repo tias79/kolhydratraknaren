@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="io.cordova.hellocordova" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="org.bitbucket.mattiaseklof.carbonhydrate-calculator" version="1.0.0" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>Kolhydraträknaren</name>
     <description>
-        A sample Apache Cordova application that responds to the deviceready event.
+        En app för att räkna mängden kolhydrater i livsmedel.
     </description>
     <author email="mattias.eklof@gmail.com">
         Mattias Eklöf
@@ -11,10 +11,12 @@
     <access origin="*" />
     <allow-intent href="http://*/*" />
     <allow-intent href="https://*/*" />
+    <!--
     <allow-intent href="tel:*" />
     <allow-intent href="sms:*" />
     <allow-intent href="mailto:*" />
     <allow-intent href="geo:*" />
+    -->
     <platform name="android">
         <allow-intent href="market:*" />
         <icon density="ldpi" src="res/android/ldpi.png" />
