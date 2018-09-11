@@ -5,8 +5,7 @@
     "description": "Cordova project for Kolhydraträknaren.",
     "main": "index.js",
     "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "deploy": "cd .. && elm-app build && cd cordova && cordova run --device"
+        "test": "echo \"Error: no test specified\" && exit 1"
     },
     "author": "Mattias Eklöf",
     "license": "Apache-2.0",
