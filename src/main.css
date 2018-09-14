@@ -5,35 +5,26 @@ html {
   box-sizing: inherit;
   margin: 0;
   padding: 0;
-  font-family: 'Source Sans Pro', 'Trebuchet MS', 'Lucida Grande', 'Bitstream Vera Sans', 'Helvetica Neue', sans-serif;
+  font-family: 'Roboto';
 }
 body {
   background: #eeeeee;
   font-size: 16pt;
+  overflow-y: hidden;
 }
 .toolbar {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   background: royalblue;
   color: white;
   padding: 0.75rem;
-  position: fixed;
-  top: 0;
   width: 100%;
-  height: 7rem;
-}
-.toolbar > * {
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
 }
 .toolbar-bottom {
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   background: black;
   color: white;
   padding: 0.75rem;
-  position: fixed;
-  bottom: 0;
   width: 100%;
-  height: 3rem;
 }
 .toolbar .menu {
   display: grid;
@@ -42,6 +33,7 @@ body {
   grid-template-columns: auto 1fr auto;
   grid-auto-flow: row dense;
 }
+
 #titleContainer {
   display: grid;
   grid-gap: 1rem;
@@ -49,18 +41,28 @@ body {
   grid-auto-flow: row dense;
 }
 .cardcontainer {
-  padding: 0.5rem;
-  margin-top: 7rem;
-  margin-bottom: 3rem;
+  background-color: #eeeeee;
+  padding: 0.75rem;
+  overflow-y: auto;
 }
 .cardcontainer .card {
   margin-bottom: 0.5rem;
+  height: auto;
 }
 .card {
   color: black;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
   background: white;
   padding: 0.75rem;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+.card hr {
+  margin-left: -0.75rem;
+  margin-right: -0.75rem;
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
 }
 .search {
   width: 100%;
@@ -125,36 +127,104 @@ hr {
 .list .icon {
   color: #e0e0e0;
 }
-.info {
-  position: absolute;
-  padding-top: 2rem;
-  padding-bottom: 2rem;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  left: 5%;
-  top: 5%;
-  width: 90%;
-  height: 90%;
-  z-index: 100;
-  margin: 0;
+#about .card {
   text-align: justify;
-  font-size: 3vw;
+  font-size: 4vw;
+  margin: 0;
 }
-.info h1 {
+#about .card h1 {
   font-size: 9vw;
   font-weight: normal;
   text-align: center;
+  margin-top: 0;
+  margin-bottom: 0;
 }
-.info h2 {
-  font-size: 5vw;
+#about .card h2 {
+  font-size: 4vw;
   font-weight: normal;
-  font-style: italic;
   text-align: center;
+  margin-top: 0;
+  margin-bottom: 0;
 }
-.logo {
+#about .logo {
   display: block;
-  width: 50%;
+  width: 75%;
   align-content: center;
   margin-left: auto;
   margin-right: auto;
+}
+#drawer {
+  font-size: 4vw;
+}
+#drawer .left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1001;
+  width: 70%;
+  height: 100%;
+  color: black;
+  background-color: white;
+  display: block;
+  transition: left 0.2s;
+}
+#drawer .right {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  height: 100%;
+  background-color: black;
+  opacity: 0.5;
+  transition: visibility 0.2s, opacity 0.2s;
+}
+#drawer ul {
+  list-style: none;
+}
+#drawer li {
+  border-bottom: 1px solid lightgrey;
+  padding: 1rem;
+  background-color: white;
+}
+#drawer .header {
+  width: 100%;
+  height: 20%;
+  background-image: linear-gradient(to bottom right, royalblue, white);
+}
+.widget {
+  position: absolute;
+  top: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+#main {
+  display: grid;
+  grid-gap: 0;
+  grid-template-columns: 100%;
+  grid-template-rows: min-content min-content auto min-content;
+  grid-auto-flow: row dense;
+}
+#license .card {
+  font-size: 4vw;
+}
+#license .card h1 {
+  font-size: 5vw;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 0;
+}
+#robotoFontLicense .card {
+  font-size: 3vw;
+  white-space: pre-wrap;
+}
+a, a:link, a:visited, a:active {
+  text-decoration: underline;
+}
+#framework {
+  width: 100%;
+  height: 100%;
 }

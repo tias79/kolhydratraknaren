@@ -1,11 +1,14 @@
 module Main exposing (..)
 
-import Html exposing (Html, text, div, h1, h2, img, input, br)
+import Html exposing (Html, text, div, h1, h2, img, input, br, ul, li, hr, a, pre)
+import Html.Attributes exposing (class, style, href)
+import Html.Events exposing (onClick)
 import Foods exposing (..)
 import Json.Decode exposing (Value)
 import UIComponents exposing(..)
-import Dom exposing (focus) 
-import Task
+import Dom exposing (focus)
+import Task exposing (attempt)
+import License exposing (..)
 
 
 ---- MODEL ----
@@ -21,7 +24,8 @@ type Msg
     | UnSelectFood Index
     | UpdateAmount Index Amount
     | FocusResult (Result Dom.Error ())
-    | UpdateInfo Bool
+    | ShowDrawer Bool
+    | SelectWidget Widget
 
 type alias Model =
     {
@@ -29,14 +33,30 @@ type alias Model =
         suggestedFoods : List Food,
         searchQuery : String,
         selectedFoods : List (Index, Food, Amount, CHAmount),
-        infoShowing : Bool
+        showDrawer : Bool,
+        activeWidget : Widget,
+        licenses : Licenses 
     }
+
+type Widget
+    = Main 
+    | About
+    | LicenseGeneral
+    | RobotoFontLicense
 
 init : Flags -> ( Model, Cmd Msg )
 init flags =
-    case Json.Decode.decodeValue Foods.decoder flags.foods of
+    case Json.Decode.decodeValue Foods.decoder (Tuple.first(flags)).foods of
         Ok foods ->
-            { foods = foods, suggestedFoods = [], searchQuery = "", selectedFoods = [], infoShowing = False } ! []
+            {
+                foods = foods,
+                suggestedFoods = [],
+                searchQuery = "",
+                selectedFoods = [],
+                showDrawer = False,
+                activeWidget = Main,
+                licenses = {robotoFontLicense = Tuple.second(flags)} 
+            } ! []
         Err err ->
             Debug.crash err
 
@@ -70,8 +90,13 @@ update msg model =
                 Debug.crash ("Can not find Dom element with id: " ++ id)
             Ok () ->
                 model ! []
-    UpdateInfo state ->
-         ({ model | infoShowing = state}, Cmd.none)
+    ShowDrawer state ->
+         ({ model | showDrawer = state}, Cmd.none)
+    SelectWidget widget ->
+        ({
+            model | activeWidget = widget,
+            showDrawer = False
+        }, Cmd.none )
         
 
 calcCHAmount : Amount -> Food -> CHAmount
@@ -86,25 +111,22 @@ view model =
         suggestions = List.map (\food -> (food.id, food.name)) model.suggestedFoods
     in
         container "framework" [
-            info model.infoShowing (UpdateInfo False)
-                [ 
-                    card [
-                        logo
-                    ],
-                    card [
-                        h1 [] [text "Kolhydraträknaren"],
-                        h2 [] [text "Version 1.0.0"]
-                    ],
-                    card [
-                        (text "Alla livsmedelsdata är hämtade från Livsmedelsverkets livsmedelsdatabas 2018-08-08. \"Livsmedelsdatabasen ska spegla det svenska livsmedelsutbudet.\""),
-                        br [] [],
-                        br [] [],
-                        (text "Kolhydraträknaren är skapad av Mattias Eklöf. Om du uppskattar appen, vänligen överväg att donera en slant till Barndiabetesfonden.")
+            container "drawer" [
+                div [class "left", style [("left", if model.showDrawer then "0" else "-70%")]] [
+                    div [class "header"] [],
+                    ul [] [
+                        li [onClick (SelectWidget About)] [text "Om"],
+                        li [onClick (SelectWidget LicenseGeneral)] [text "Licenser"]
                     ]
-                ],
-            container "main" [
+                ]
+                ,
+                div [class "right", style [("opacity", if model.showDrawer then "0.5" else "0"), ("visibility", if model.showDrawer then "visible" else "hidden")], onClick (ShowDrawer False)] []
+            ],
+            widget "main" (model.activeWidget == Main) [
                 toolbar [
-                    menu "Kolhydraträknaren" (UpdateInfo True),
+                    menu "menu" "Kolhydraträknaren" (ShowDrawer True)
+                ],
+                toolbar [
                     searchCard model.searchQuery (\x -> ChangeSearchQuery x) ClearSuggestions (\x -> SelectFood x) suggestions
                 ],
                 cardContainer
@@ -115,7 +137,7 @@ view model =
                                 numberinput (\x -> UpdateAmount idx x) amount,
                                 text "g",
                                 br [] [],
-                                text (food.name ++ " (" ++ toString (food.gPercentage * 100) ++ "g/100g)"),
+                                text (food.name ++ " (" ++ toString (round (food.gPercentage * 100)) ++ "g/100g)"),
                                 br [] [],
                                 text ("= " ++ toString chAmount ++ " g kh")
                             ]) model.selectedFoods),
@@ -126,14 +148,54 @@ view model =
                             |> toString)
                         ++ " g kh")
                 ]
+            ],
+            widget "about" (model.activeWidget == About) [
+                toolbar [
+                    menu "arrow_back" "Om" (SelectWidget Main)
+                ],
+                card [
+                    br [] [],
+                    br [] [],
+                    logo,
+                    br [] [],
+                    br [] [],
+                    h1 [] [text "Kolhydraträknaren"],
+                    h2 [] [text "Version 1.0.0"],
+                    br [] [],
+                    br [] [],
+                    (text "Alla livsmedelsdata är hämtade från Livsmedelsverkets livsmedelsdatabas 2018-08-08. \"Livsmedelsdatabasen ska spegla det svenska livsmedelsutbudet.\""),
+                    br [] [],
+                    br [] [],
+                    (text "Kolhydraträknaren är skapad av Mattias Eklöf. Om du uppskattar appen, vänligen överväg att donera en slant till Barndiabetesfonden."),
+                    br [] [],
+                    br [] [],
+                    br [] []
+                ]
+            ],
+            widget "license" (model.activeWidget == LicenseGeneral) [
+                toolbar [
+                    menu "arrow_back" "Licenser" (SelectWidget Main)
+                ],
+                card [
+                    h1 [] [ text "Roboto Font" ],
+                    text "© Google Inc. - ", a [onClick (SelectWidget RobotoFontLicense)] [text "Apache License 2.0"],
+                    hr [] []
+                ]
+            ],
+            widget "robotoFontLicense" (model.activeWidget == RobotoFontLicense) [
+                toolbar [
+                    menu "arrow_back" "Roboto Font License" (SelectWidget LicenseGeneral)
+                ],
+                card [
+                    text model.licenses.robotoFontLicense
+                ]
             ]
         ]
 
 ---- PROGRAM ----
 
-
 type alias Flags =
-    { foods : Json.Decode.Value }
+    ({ foods : Json.Decode.Value }, RobotoFontLicense)
 
 main : Program Flags Model Msg
 main =

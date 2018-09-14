@@ -1,4 +1,4 @@
-module UIComponents exposing (toolbar, bottombar, card, cardContainer, searchCard, clearButton, numberinput, icon, menu, container, info, logo)
+module UIComponents exposing (toolbar, bottombar, card, cardContainer, searchCard, button, clearButton, numberinput, icon, menu, container, logo, drawer, widget, separator)
 
 import Html exposing (Html, text, div, h1, img, input, i, hr, ul, li, span, a)
 import Html.Attributes exposing (..)
@@ -52,6 +52,10 @@ clearButton clearMsg id =
         smallIcon [ onClick (clearMsg id)] "clear"
     ]
 
+button : String -> msg -> Html msg
+button name msg =
+    icon [ onClick msg] name
+
 separator : Html msg
 separator = hr [] []
 
@@ -81,18 +85,38 @@ icon attrs name = i ([ class "icon material-icons"] ++ attrs) [ text name]
 smallIcon : List (Html.Attribute msg) -> String -> Html msg
 smallIcon attrs name = i ([ class "smallIcon material-icons"] ++ attrs) [ text name]
 
-menu : String -> msg -> Html msg
-menu title toggle = div [ class "menu" ] [
-        icon [ onClick toggle ] "info",
+menu : String -> String -> msg -> Html msg
+menu iconName title action =
+    div [ class "menu" ] [
+        icon [ onClick action ] iconName,
         text title
-        ]
+    ]
 
 container : String -> List (Html msg) -> Html msg
 container identity = div [ id identity ]
 
-info : Bool -> msg -> List (Html msg) -> Html msg
-info show doClose children = div [class "info", style [if show then ("display", "block") else ("display", "none") ], onClick doClose]
-                children
+widget : String -> Bool -> List (Html msg) -> Html msg
+widget identity active = 
+    div [ 
+        id identity,
+        class "widget",
+        style [
+            ("visibility", if active then "visible" else "hidden")] 
+        ]
+
+drawer : Bool -> msg -> List (Html msg) -> Html msg
+drawer show doClose children = 
+    div [class "drawer", style [("left", if show then "0px" else "-70%"), ("display", if show then "block" else "none")]] [
+        div [class "drawerLeft"] [
+            div [class "header"] [],
+            ul [] [
+                li [] [text "Om"],
+                li [] [text "Licenser"]
+            ]
+        ]
+        ,
+        div [class "drawerRight", onClick doClose] []
+    ]
 
 logo : Html msg
 logo = img ([class "logo", src "logo.svg"]) []
