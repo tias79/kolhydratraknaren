@@ -89,7 +89,7 @@ menu : String -> String -> msg -> Html msg
 menu iconName title action =
     div [ class "menu" ] [
         icon [ onClick action ] iconName,
-        text title
+        span [] [text title]
     ]
 
 container : String -> List (Html msg) -> Html msg
