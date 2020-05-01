@@ -1,122 +1,214 @@
-module UIComponents exposing (toolbar, bottombar, card, cardContainer, searchCard, button, clearButton, numberinput, icon, menu, container, logo, drawer, widget, separator)
+module UIComponents exposing (bottombar, button, card, cardContainer, clearButton, container, drawer, icon, logo, menu, numberinput, searchCard, separator, toolbar, widget)
 
-import Html exposing (Html, text, div, h1, img, input, i, hr, ul, li, span, a)
+import Foods exposing (Food, FoodId)
+import Html exposing (Html, div, hr, i, img, input, li, span, text, ul)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import String exposing (toInt)
 
-search : String -> (String -> msg) -> msg -> (Int -> msg) -> Bool -> Html msg
-search searchQuery changeSearchQueryMsg clearSuggestionsMsg selectMsg enableBack =
-    let
-        leftIcon = icon [ onClick clearSuggestionsMsg ] (if enableBack then "arrow_back" else "search")
-        rightIcon = icon [ onClick clearSuggestionsMsg ] (if enableBack then "clear" else "")
-    in
-        div [ class "search" ]
-            [
-            leftIcon,
-            input [ id "searchInput", type_ "text", placeholder "Sök livsmedel", onInput changeSearchQueryMsg, value searchQuery ] [],
-            rightIcon
-            ]
 
-searchCard : String -> (String -> msg) -> msg -> (Int -> msg) -> List (Int, String) -> Html msg
-searchCard searchQuery changeSearchQueryMsg clearSuggestionsMsg selectMsg suggestions =
+search : String -> (String -> msg) -> msg -> Bool -> Html msg
+search searchQuery changeSearchQueryMsg clearSuggestionsMsg enableBack =
     let
-        hasSuggestions = not (List.isEmpty suggestions)
-        separatorComponent = if hasSuggestions then separator else empty
-        listComponent = if hasSuggestions then card [ list suggestions selectMsg ] else empty
+        leftIcon =
+            icon [ onClick clearSuggestionsMsg ]
+                (if enableBack then
+                    "arrow_back"
+
+                 else
+                    "search"
+                )
+
+        rightIcon =
+            icon [ onClick clearSuggestionsMsg ]
+                (if enableBack then
+                    "clear"
+
+                 else
+                    ""
+                )
     in
-        div [ class "searchCard" ] [
-            card [
-                search searchQuery changeSearchQueryMsg clearSuggestionsMsg selectMsg hasSuggestions
-            ],
-            listComponent
+    div [ class "search" ]
+        [ leftIcon
+        , input [ id "searchInput", type_ "text", placeholder "Sök livsmedel", onInput changeSearchQueryMsg, value searchQuery ] []
+        , rightIcon
         ]
 
-toolbar  : List (Html msg) -> Html msg
-toolbar = div [ class "toolbar" ]
 
-bottombar  : List (Html msg) -> Html msg
-bottombar = div [ class "toolbar-bottom" ]
+searchCard : String -> (String -> msg) -> msg -> (FoodId -> msg) -> (String -> msg) -> (FoodId -> msg) -> List Food -> Html msg
+searchCard searchQuery changeSearchQueryMsg clearSuggestionsMsg selectMsg addMsg deleteMsg suggestions =
+    let
+        hasSearchQuery =
+            not (String.isEmpty searchQuery)
+
+        listComponent =
+            if hasSearchQuery then
+                card [ list searchQuery suggestions selectMsg addMsg deleteMsg ]
+
+            else
+                empty
+    in
+    div [ class "searchCard" ]
+        [ card
+            [ search searchQuery changeSearchQueryMsg clearSuggestionsMsg hasSearchQuery
+            ]
+        , listComponent
+        ]
+
+
+toolbar : List (Html msg) -> Html msg
+toolbar =
+    div [ class "toolbar" ]
+
+
+bottombar : List (Html msg) -> Html msg
+bottombar =
+    div [ class "toolbar-bottom" ]
+
 
 cardContainer : List (Html msg) -> Html msg
 cardContainer =
     div [ class "cardcontainer" ]
 
+
 card : List (Html msg) -> Html msg
 card =
     div [ class "card" ]
 
+
 clearButton : (Int -> msg) -> Int -> Html msg
 clearButton clearMsg id =
-    div [] [
-        smallIcon [ onClick (clearMsg id)] "clear"
-    ]
+    div []
+        [ smallIcon [ onClick (clearMsg id) ] "clear"
+        ]
+
 
 button : String -> msg -> Html msg
 button name msg =
-    icon [ onClick msg] name
+    icon [ onClick msg ] name
+
 
 separator : Html msg
-separator = hr [] []
+separator =
+    hr [] []
 
-list : List (Int, String) -> (Int -> msg) -> Html msg
-list items selectMsg =
+
+list : String -> List Food -> (FoodId -> msg) -> (String -> msg) -> (FoodId -> msg) -> Html msg
+list searchQuery items selectMsg addMsg deleteMsg =
     div [ class "list" ]
-        (List.concatMap (\(id, name) -> [
-            div [][],
-            div [onClick (selectMsg id)] [
-                text name
-            ]
-        ]
-        ) items)
+        ([ icon [ onClick (addMsg searchQuery) ] "add", div [ class "add" ] [ text searchQuery ], div [] [] ]
+            ++ List.concatMap
+                (\food ->
+                    [ div []
+                        [ if food.source == Foods.USER then
+                            icon [ onClick (deleteMsg food.id) ] "delete"
+
+                          else
+                            empty
+                        ]
+                    , div [ onClick (selectMsg food.id) ]
+                        [ text food.name ]
+                    , div [] []
+                    ]
+                )
+                items
+        )
+
 
 empty : Html msg
-empty = text ""
+empty =
+    text ""
+
 
 numberinput : (Int -> msg) -> Int -> Html msg
-numberinput msg nr = input [type_ "number", style [("width", "3rem")], onInput (\str ->
-    msg (case (toInt str) of
-        Err err -> 0
-        Ok val -> val)), value (toString nr)] []
+numberinput msg nr =
+    input
+        [ type_ "number"
+        , style "width" "2.5rem"
+        , onInput
+            (\str ->
+                msg
+                    (case toInt str of
+                        Just val ->
+                            val
+
+                        Nothing ->
+                            0
+                    )
+            )
+        , value (String.fromInt nr)
+        ]
+        []
+
 
 icon : List (Html.Attribute msg) -> String -> Html msg
-icon attrs name = i ([ class "icon material-icons"] ++ attrs) [ text name]
+icon attrs name =
+    i ([ class "icon material-icons" ] ++ attrs) [ text name ]
+
 
 smallIcon : List (Html.Attribute msg) -> String -> Html msg
-smallIcon attrs name = i ([ class "smallIcon material-icons"] ++ attrs) [ text name]
+smallIcon attrs name =
+    i ([ class "smallIcon material-icons" ] ++ attrs) [ text name ]
+
 
 menu : String -> String -> msg -> Html msg
 menu iconName title action =
-    div [ class "menu" ] [
-        icon [ onClick action ] iconName,
-        span [] [text title]
-    ]
+    div [ class "menu" ]
+        [ icon [ onClick action ] iconName
+        , span [] [ text title ]
+        ]
+
 
 container : String -> List (Html msg) -> Html msg
-container identity = div [ id identity ]
+container identity =
+    div [ id identity ]
+
 
 widget : String -> Bool -> List (Html msg) -> Html msg
-widget identity active = 
-    div [ 
-        id identity,
-        class "widget",
-        style [
-            ("visibility", if active then "visible" else "hidden")] 
+widget identity active =
+    div
+        [ id identity
+        , class "widget"
+        , style "visibility"
+            (if active then
+                "visible"
+
+             else
+                "hidden"
+            )
         ]
+
 
 drawer : Bool -> msg -> List (Html msg) -> Html msg
-drawer show doClose children = 
-    div [class "drawer", style [("left", if show then "0px" else "-70%"), ("display", if show then "block" else "none")]] [
-        div [class "drawerLeft"] [
-            div [class "header"] [],
-            ul [] [
-                li [] [text "Om"],
-                li [] [text "Licenser"]
-            ]
+drawer show doClose children =
+    div
+        [ class "drawer"
+        , style "left"
+            (if show then
+                "0px"
+
+             else
+                "-70%"
+            )
+        , style "display"
+            (if show then
+                "block"
+
+             else
+                "none"
+            )
         ]
-        ,
-        div [class "drawerRight", onClick doClose] []
-    ]
+        [ div [ class "drawerLeft" ]
+            [ div [ class "header" ] []
+            , ul []
+                [ li [] [ text "Om" ]
+                , li [] [ text "Licenser" ]
+                ]
+            ]
+        , div [ class "drawerRight", onClick doClose ] []
+        ]
+
 
 logo : Html msg
-logo = img ([class "logo", src "logo.svg"]) []
+logo =
+    img [ class "logo", src "logo.svg" ] []

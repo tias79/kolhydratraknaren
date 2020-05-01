@@ -69,7 +69,7 @@ body {
 .search {
   width: 100%;
   display: grid;
-  grid-gap: 0.75rem;
+  grid-gap: 0.25rem;
   grid-template-columns: auto 1fr auto;
   grid-auto-flow: row dense;
 }
@@ -79,6 +79,12 @@ body {
 .search input {
   width: 100%;
   border-width: 0px;
+}
+.search .action {
+  align-self: start;
+}
+.search .action .smallIcon {
+  float: left;
 }
 input {
   border-bottom: 1px solid black;
@@ -92,18 +98,22 @@ input {
   width: 1.4rem;
   height: 1.4rem;
   font-size: 1.4rem;
+  color: #606060;
 }
 .smallIcon {
   width: 1rem;
   height: 1rem;
   font-size: 1rem;
+  color: #606060;
+}
+.menu .icon {
+  color: lightgrey;
+}
+.menu .smallicon {
+  color: lightgrey;
 }
 .card .smallIcon {
   float: right;
-  color: #606060;
-}
-.search .icon {
-  color: #606060;
 }
 hr {
   border: 0;
@@ -114,7 +124,7 @@ hr {
 .list {
   display: grid;
   grid-gap: 0.75rem;
-  grid-template-columns: 1.4rem 1fr;
+  grid-template-columns: 1rem 1fr 1.4rem;
   grid-auto-flow: row dense;
   max-height: calc(95vh - 10rem);
   overflow: auto;
@@ -122,8 +132,9 @@ hr {
 .list > * {
   align-self: center;
 }
-.list .icon {
-  color: #e0e0e0;
+.list .add {
+  color: #606060;
+  font-style: italic;
 }
 #about .card {
   text-align: justify;
